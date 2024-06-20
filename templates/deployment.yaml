@@ -1,0 +1,40 @@
+{{ $common := .Values }}
+{{ $fullname := include "jellyfin.fullname" . }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "jellyfin.fullname" . }}
+  labels:
+    {{- include "jellyfin.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "jellyfin.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "jellyfin.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+        - name: JELLYFIN_PublishedServerUrl
+          value: http://{{ .Values.ingress.host }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.service.port }}
+          protocol: TCP
+        volumeMounts:
+        {{- range $name, $size := .Values.storage.sizes }}
+        - name: {{ $name }}
+          mountPath: /{{ $name }}
+        {{- end }}
+      volumes:
+      {{- range $name, $size := .Values.storage.sizes }}
+      - name: {{ $name }}
+        persistentVolumeClaim:
+          claimName: {{ printf "%s-%s" ($fullname) ($name) }}
+      {{- end }}

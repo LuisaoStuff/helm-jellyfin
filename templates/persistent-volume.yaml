@@ -1,0 +1,28 @@
+{{ $common := .Values }}
+{{ $fullname := include "jellyfin.fullname" . }}
+{{ range $name, $size := .Values.storage.sizes }}
+{{ $name := $name | snakecase | replace "_" "-" }}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ printf "%s-%s" ($fullname) ($name) }}
+  namespace: {{ $common.namespace }}
+spec:
+  capacity:
+    storage: {{ $size }}
+  accessModes:
+  - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: {{ $common.storage.className }}
+  local:
+    path: {{ $common.storage.basePath }}/{{ $name }}/
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - {{ $common.storage.hostname }}
+{{- end }}
