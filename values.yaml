@@ -11,19 +11,22 @@ service:
 
 ingress:
   enabled: true
-  host: jellyfin.luisva.com
-  tls:
-    name: tls-secret
-    cert: base64EncodedCertificate
-    key: base64EncodedKey
+  hosts: []
+  #- host: jellyfin.example.com
+  #  tls:
+  #    enabled: true
+  #    name: tls-secret
+  #    cert: base64EncodedCertificate
+  #    key: base64EncodedKey
 
 storage:
-  className: local-storage
-  basePath: /basepath 
+  className: jellyfin-storage
+  basePath: /nas/plex
   hostname: cronos
   sizes:
     # You need to define the local directories like /basepath/config, /basepath/cache, /basepath/media...
     # On the container side we will have /config, /cache, /media... with sizes defined
     config: 5Gi
     cache: 10Gi
-    media: 100Gi
+    peliculas: 1500Gi
+    series: 500Gi
