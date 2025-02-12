@@ -18,6 +18,13 @@ spec:
     spec:
       containers:
       - name: {{ .Chart.Name }}
+        resources:
+          requests:
+            cpu: 2
+            memory: 8G
+          limits: 
+            cpu: 3
+            memory: 12G
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
